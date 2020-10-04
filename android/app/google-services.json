@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "560783875536",
+    "firebase_url": "https://astronaut-helper.firebaseio.com",
+    "project_id": "astronaut-helper",
+    "storage_bucket": "astronaut-helper.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:560783875536:android:9f67bb399e59a0abd36dd5",
+        "android_client_info": {
+          "package_name": "com.halbas.astronauthelper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "560783875536-0kf242fluntn8acu46kbf4g5tqvnjs5d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTGnsr25Ss2zqdk9hKyAUn46lw1FwuVYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "560783875536-0kf242fluntn8acu46kbf4g5tqvnjs5d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
