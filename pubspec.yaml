@@ -32,6 +32,7 @@ flutter:
 
   assets:
     - images/
+    - images/general_information/
 
   fonts:
     - family: SansitaSwashed

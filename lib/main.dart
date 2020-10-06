@@ -1,19 +1,21 @@
 import 'package:astronauthelper/authentication/member_signup_details_screen.dart';
 import 'package:astronauthelper/authentication/signup_options_screen.dart';
 import 'package:astronauthelper/authentication/signup_screen.dart';
-import 'package:astronauthelper/provider/commander_mode.dart';
 import 'package:astronauthelper/provider/modal_hud.dart';
+import 'package:astronauthelper/screens/commander/commander_schedule.dart';
 import 'package:astronauthelper/screens/commander/commander_screen.dart';
 import 'package:astronauthelper/screens/general_information.dart';
 import 'package:astronauthelper/screens/home.dart';
 import 'package:astronauthelper/screens/member/member_schedule.dart';
 import 'package:astronauthelper/screens/member/member_screen.dart';
+import 'package:astronauthelper/services/fire_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'authentication/login_screen.dart';
+
 import 'authentication/commander_signup_details_screen.dart';
+import 'authentication/login_screen.dart';
 import 'constants.dart';
 
 main() => runApp((myApp()));
@@ -26,6 +28,7 @@ class myApp extends StatefulWidget {
 class _myAppState extends State<myApp> {
   bool isLoggedIn = false;
   FlutterLocalNotificationsPlugin fltrNotification;
+  final _fireStore = FireStore();
 
   @override
   void initState() {
@@ -53,15 +56,12 @@ class _myAppState extends State<myApp> {
               ChangeNotifierProvider<ModalHud>(
                 create: (context) => ModalHud(),
               ),
-              ChangeNotifierProvider<CommanderMode>(
-                create: (context) => CommanderMode(),
-              ),
             ],
             child: MaterialApp(
               theme: ThemeData.light().copyWith(
-                primaryColor: Color(0xFF0066B2),
+                primaryColor: kSecondaryColor,
               ),
-              initialRoute: isLoggedIn ? CommanderScreen.id : LoginScreen.id,
+              initialRoute: isLoggedIn ? Home.id : LoginScreen.id,
               routes: {
                 LoginScreen.id: (context) => LoginScreen(),
                 SignupScreen.id: (context) => SignupScreen(),
@@ -72,6 +72,7 @@ class _myAppState extends State<myApp> {
                     MemberSignupDetailsScreen(),
                 Home.id: (context) => Home(),
                 CommanderScreen.id: (context) => CommanderScreen(),
+                CommanderSchedule.id: (context) => CommanderSchedule(),
                 MemberScreen.id: (context) => MemberScreen(),
                 MemberSchedule.id: (context) => MemberSchedule(),
                 GeneralInformation.id: (context) => GeneralInformation(),

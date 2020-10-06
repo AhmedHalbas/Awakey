@@ -9,10 +9,10 @@ import 'package:astronauthelper/services/fire_store.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CommanderSignupDetailsScreen extends StatefulWidget {
   static String id = 'CommanderSignupDetailsScreen';
@@ -26,6 +26,7 @@ class _CommanderSignupDetailsScreenState
     extends State<CommanderSignupDetailsScreen> {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   var textController = TextEditingController();
+  final focusNode = FocusNode();
 
   final auth = Auth();
 
@@ -36,7 +37,7 @@ class _CommanderSignupDetailsScreenState
   @override
   void initState() {
     super.initState();
-    getUserID();
+    getId();
   }
 
   @override
@@ -141,18 +142,18 @@ class _CommanderSignupDetailsScreenState
                 CustomTextField(
                   controller: textController,
                   onTap: () {
-                    SystemChannels.textInput.invokeMethod('TextInput.hide');
+                    FocusScope.of(context).requestFocus(new FocusNode());
+
+                    //SystemChannels.textInput.invokeMethod('TextInput.hide');
                     DatePicker.showDateTimePicker(context,
                         showTitleActions: true,
                         minTime: DateTime(2020, 10, 1),
                         maxTime: DateTime(2025, 12, 31), onConfirm: (date) {
-                      print('confirm $date');
                       setState(() {
-                        textController.text = date.toIso8601String();
+                        textController.text = date.toString();
                       });
                     }, currentTime: DateTime.now(), locale: LocaleType.en);
                   },
-                  textInputType: TextInputType.datetime,
                   hint: 'Enter Departure Date and Time',
                   icon: Icons.date_range,
                   onSaved: (value) {
@@ -179,6 +180,7 @@ class _CommanderSignupDetailsScreenState
                               ),
                             );
                           } else {
+                            print(uId);
                             modalHud.changeisLoading(true);
                             _fireStore.addCommander(
                                 Commander(
@@ -202,7 +204,7 @@ class _CommanderSignupDetailsScreenState
                       color: Colors.black,
                       child: Text(
                         'Finish',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: kMainColor),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -221,9 +223,8 @@ class _CommanderSignupDetailsScreenState
     );
   }
 
-  void getUserID() async {
-    firebaseUser = await auth.getUser();
-    uId = firebaseUser.uid;
-    // here you write the codes to input the data into firestore
+  getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uId = prefs.getString(kUserId);
   }
 }

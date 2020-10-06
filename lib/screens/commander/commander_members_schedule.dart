@@ -1,16 +1,18 @@
-import 'package:astronauthelper/services/auth.dart';
 import 'package:astronauthelper/constants.dart';
+import 'package:astronauthelper/services/auth.dart';
 import 'package:astronauthelper/services/fire_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import '../../functions.dart';
 
 class CommandersMembersSchedule extends StatefulWidget {
-  int numberOfMembers;
+  static String id = 'CommandersMembersSchedule';
   List<String> membersName = [];
-  CommandersMembersSchedule(this.numberOfMembers, this.membersName);
+
+  CommandersMembersSchedule(this.membersName);
+
   @override
   _CommandersMembersScheduleState createState() =>
       _CommandersMembersScheduleState();
@@ -21,23 +23,14 @@ class _CommandersMembersScheduleState extends State<CommandersMembersSchedule> {
   String buttonText = 'Edit Time';
   int tapBarIndex = 0, numberOfMembers;
   String uId, memberId;
-  List<String> names = [];
   String memberName;
   final auth = Auth();
   final _fireStore = FireStore();
   List<String> newTimes = [];
 
   @override
-  void initState() {
-    super.initState();
-    defaultData();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    names = widget.membersName;
-
-    if (names.isEmpty) {
+    if (widget.membersName.isEmpty) {
       return Center(
         child: Text(
           'No Members Yet',
@@ -46,7 +39,7 @@ class _CommandersMembersScheduleState extends State<CommandersMembersSchedule> {
       );
     } else {
       return DefaultTabController(
-        length: names.length,
+        length: widget.membersName.length,
         child: Padding(
           padding: const EdgeInsets.only(top: 20),
           child: Scaffold(
@@ -61,9 +54,9 @@ class _CommandersMembersScheduleState extends State<CommandersMembersSchedule> {
               tabs: getFittedBoxes(),
             ),
             body: TabBarView(
-              children: List<Widget>.generate(names.length, (int index) {
-                print(names[0]);
-                return memberView(names[index]);
+              children:
+              List<Widget>.generate(widget.membersName.length, (int index) {
+                return memberView();
               }),
             ),
           ),
@@ -72,8 +65,7 @@ class _CommandersMembersScheduleState extends State<CommandersMembersSchedule> {
     }
   }
 
-  memberView(name) {
-    defaultData2(name);
+  memberView() {
     return SizedBox.expand(
       child: ListView(scrollDirection: Axis.vertical, children: <Widget>[
         Padding(
@@ -95,41 +87,59 @@ class _CommandersMembersScheduleState extends State<CommandersMembersSchedule> {
             color: Colors.black,
             child: Text(
               buttonText,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: kMainColor),
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
           ),
         ),
-        StreamBuilder<DocumentSnapshot>(
-            stream: _fireStore.getScheduleData(memberId),
-            builder: (BuildContext context,
-                AsyncSnapshot<DocumentSnapshot> snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data.documentID == memberId) {
-                  newTimes = [];
-                  for (String activity in dailyActivities) {
-                    newTimes.add(snapshot.data.data[activity]);
-                  }
+        StreamBuilder<QuerySnapshot>(
+          stream: _fireStore.getMemberId(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasData) {
+              for (int i = 0; i < snapshot.data.documents.length; i++) {
+                DocumentSnapshot document = snapshot.data.documents[i];
+                if (document[kIsCommander] == false &&
+                    document[kMemberName] == widget.membersName[tapBarIndex]) {
+                  memberId = document.documentID;
                 }
-
-                return DataTable(columns: [
-                  DataColumn(label: Text('Activity')),
-                  DataColumn(label: Text('Time')),
-                ], rows: getDataRows(dailyActivities, newTimes));
-              } else {
-                return Center(child: CircularProgressIndicator());
               }
-            })
+              return StreamBuilder<DocumentSnapshot>(
+                  stream: _fireStore.getScheduleData(memberId),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      newTimes.clear();
+                      print('HERE:${memberId}');
+                      if (snapshot.data[dailyActivities[0]] != null) {
+                        for (String activity in dailyActivities) {
+                          newTimes.add(snapshot.data[activity]);
+                        }
+                      } else {
+                        defaultData(memberId);
+                        newTimes.addAll(times);
+                      }
+
+                      return DataTable(columns: [
+                        DataColumn(label: Text('Activity')),
+                        DataColumn(label: Text('Time')),
+                      ], rows: getDataRows(dailyActivities, newTimes));
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  });
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
       ]),
     );
   }
 
   List<DataRow> getDataRows(List<String> activities, List<String> newTimes) {
-    if (newTimes[0] == null) {
-      newTimes = times;
-    }
     List<DataRow> list = List<DataRow>();
     for (var i = 0; i < activities.length; i++) {
       if (i == activities.length - 1) {
@@ -153,15 +163,15 @@ class _CommandersMembersScheduleState extends State<CommandersMembersSchedule> {
                 TextFormField(
                   initialValue: newTimes[i],
                   enabled: isEnabled,
-                  onChanged: (val) {
+                  onFieldSubmitted: (val) {
                     newTimes[i] = val;
                     Firestore.instance
                         .collection(kUserCollection)
                         .document(memberId)
                         .updateData({dailyActivities[i]: val});
-
                     setState(() {});
                   },
+                  onChanged: (val) {},
                 ),
                 showEditIcon: isShown),
           ]),
@@ -171,53 +181,12 @@ class _CommandersMembersScheduleState extends State<CommandersMembersSchedule> {
     return list;
   }
 
-  defaultData2(name) {
-    CollectionReference _documentRef =
-        Firestore.instance.collection(kUserCollection);
-
-    _documentRef.getDocuments().then((ds) {
-      if (ds != null) {
-        ds.documents.forEach((value) {
-          if (value.data[kIsCommander] == false &&
-              value.data[kMemberName] == name) {
-            print('HERE');
-            memberId = value.documentID;
-          }
-        });
-      }
-    });
-  }
-
-  defaultData() {
-    CollectionReference _documentRef =
-        Firestore.instance.collection(kUserCollection);
-
-    _documentRef.getDocuments().then((ds) {
-      if (ds != null) {
-        ds.documents.forEach((value) {
-          if (value.data[kIsCommander] == false &&
-              value.data[kMemberName] == names[tapBarIndex]) {
-            print('HERE');
-            memberId = value.documentID;
-            setState(() {});
-          }
-        });
-      }
-    });
-    for (int i = 0; i < dailyActivities.length; i++) {
-      Firestore.instance
-          .collection(kUserCollection)
-          .document(memberId)
-          .updateData({dailyActivities[i]: times[i]});
-    }
-  }
-
   List<Text> getFittedBoxes() {
     List<Text> list = List<Text>();
-    for (var i = 0; i < names.length; i++) {
+    for (var i = 0; i < widget.membersName.length; i++) {
       list.add(
         Text(
-          names[i],
+          widget.membersName[i],
           style: TextStyle(
             color: Colors.black,
             fontSize: 16,

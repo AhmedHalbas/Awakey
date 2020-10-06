@@ -9,7 +9,7 @@ class LogoAndName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 50),
+      padding: EdgeInsets.only(top: 20),
       child: Column(
         children: <Widget>[
           Image.asset(
@@ -20,7 +20,7 @@ class LogoAndName extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              title,
+              title ?? '',
               style: TextStyle(
                 fontFamily: 'SansitaSwashed',
                 fontSize: 20,

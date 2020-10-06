@@ -1,10 +1,10 @@
-import 'package:astronauthelper/custom_widgets/alert_dialog.dart';
 import 'package:astronauthelper/custom_widgets/information_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class GeneralInformation extends StatefulWidget {
   static String id = 'GeneralInformation';
+
   @override
   _GeneralInformationState createState() => _GeneralInformationState();
 }
@@ -12,11 +12,21 @@ class GeneralInformation extends StatefulWidget {
 class _GeneralInformationState extends State<GeneralInformation> {
   @override
   Widget build(BuildContext context) {
+    final arguments = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     return Scaffold(
+      appBar: arguments != null
+          ? AppBar(
+        title: Text('General Information'),
+      )
+          : null,
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -25,11 +35,11 @@ class _GeneralInformationState extends State<GeneralInformation> {
                 children: <Widget>[
                   InformationItem(
                     itemText: 'Sleep Shifts System',
-                    Image: 'images/sleep.png',
+                    Image: 'images/general_information/sleep.png',
                   ),
                   InformationItem(
                     itemText: 'Nutrition System',
-                    Image: 'images/nutrition.png',
+                    Image: 'images/general_information/nutrition.png',
                   ),
                 ],
               ),
@@ -39,11 +49,11 @@ class _GeneralInformationState extends State<GeneralInformation> {
                 children: <Widget>[
                   InformationItem(
                     itemText: 'Exercise System',
-                    Image: 'images/exercise.png',
+                    Image: 'images/general_information/exercise.png',
                   ),
                   InformationItem(
                     itemText: 'Medication System',
-                    Image: 'images/medication.png',
+                    Image: 'images/general_information/medication.png',
                   ),
                 ],
               ),
@@ -53,11 +63,12 @@ class _GeneralInformationState extends State<GeneralInformation> {
                 children: <Widget>[
                   InformationItem(
                     itemText: 'General Roles',
-                    Image: 'images/roles.png',
+                    Image: 'images/general_information/roles.png',
                   ),
                   InformationItem(
                     itemText: 'Meed More Help? \n contact medical',
-                    Image: 'images/help.png',
+                    Image: 'images/general_information/help.png',
+                    onPress: () {},
                   ),
                 ],
               ),

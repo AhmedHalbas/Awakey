@@ -12,26 +12,25 @@ import 'commander_schedule.dart';
 
 class CommanderScreen extends StatefulWidget {
   static String id = 'CommanderScreen';
+
   @override
   _CommanderScreenState createState() => _CommanderScreenState();
 }
 
 class _CommanderScreenState extends State<CommanderScreen> {
   final auth = Auth();
-  int navBarIndex = 0, numberOfMembers;
+  int navBarIndex = 0;
   String uId;
   List<String> membersNames;
 
   @override
   void initState() {
-    getUserID();
-
     super.initState();
+    getId();
   }
 
   @override
   Widget build(BuildContext context) {
-    getNumberOfMembers(uId);
     getMembersNames();
     Widget child;
     switch (navBarIndex) {
@@ -39,7 +38,7 @@ class _CommanderScreenState extends State<CommanderScreen> {
         child = CommanderSchedule();
         break;
       case 1:
-        child = CommandersMembersSchedule(numberOfMembers, membersNames);
+        child = CommandersMembersSchedule(membersNames);
         break;
       case 2:
         child = GeneralInformation();
@@ -102,63 +101,48 @@ class _CommanderScreenState extends State<CommanderScreen> {
           },
           currentIndex: navBarIndex,
           type: BottomNavigationBarType.fixed,
-          unselectedItemColor: kUnActiveColor,
+          unselectedItemColor: kSecondaryColor,
           fixedColor: kMainColor,
           items: [
             BottomNavigationBarItem(
               title: Text(
                 'Home',
                 style: TextStyle(
-                  color: kUnActiveColor,
+                  color: kSecondaryColor,
                 ),
               ),
               icon: Icon(
                 Icons.home,
-                color: kUnActiveColor,
+                color: kSecondaryColor,
               ),
             ),
             BottomNavigationBarItem(
               title: Text(
                 'Members',
                 style: TextStyle(
-                  color: kUnActiveColor,
+                  color: kSecondaryColor,
                 ),
               ),
               icon: Icon(
                 Icons.person,
-                color: kUnActiveColor,
+                color: kSecondaryColor,
               ),
             ),
             BottomNavigationBarItem(
               title: Text(
                 'General Info',
                 style: TextStyle(
-                  color: kUnActiveColor,
+                  color: kSecondaryColor,
                 ),
               ),
               icon: Icon(
                 Icons.info,
-                color: kUnActiveColor,
+                color: kSecondaryColor,
               ),
             ),
           ],
         ),
         body: SizedBox.expand(child: child));
-  }
-
-  Future<void> getNumberOfMembers(uid) async {
-    DocumentSnapshot commanderData = await Firestore.instance
-        .collection(kUserCollection)
-        .document(uid)
-        .get();
-
-    numberOfMembers = commanderData.data[kNumberOfMembers];
-  }
-
-  Future<void> getUserID() async {
-    uId = (await auth.getUser()).uid;
-    setState(() {});
-    // here you write the codes to input the data into firestore
   }
 
   void getMembersNames() {
@@ -184,5 +168,10 @@ class _CommanderScreenState extends State<CommanderScreen> {
     } else {
       throw 'Could not launch $uri';
     }
+  }
+
+  getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uId = prefs.getString(kUserId);
   }
 }

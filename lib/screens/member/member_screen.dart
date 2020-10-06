@@ -1,10 +1,8 @@
 import 'package:astronauthelper/authentication/login_screen.dart';
 import 'package:astronauthelper/screens/member/member_schedule.dart';
 import 'package:astronauthelper/services/auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants.dart';
@@ -12,6 +10,7 @@ import '../general_information.dart';
 
 class MemberScreen extends StatefulWidget {
   static String id = 'MemberScreen';
+
   @override
   _MemberScreenState createState() => _MemberScreenState();
 }
@@ -92,31 +91,31 @@ class _MemberScreenState extends State<MemberScreen> {
           },
           currentIndex: navBarIndex,
           type: BottomNavigationBarType.fixed,
-          unselectedItemColor: kUnActiveColor,
+          unselectedItemColor: kSecondaryColor,
           fixedColor: kMainColor,
           items: [
             BottomNavigationBarItem(
               title: Text(
                 'Home',
                 style: TextStyle(
-                  color: kUnActiveColor,
+                  color: kSecondaryColor,
                 ),
               ),
               icon: Icon(
                 Icons.home,
-                color: kUnActiveColor,
+                color: kSecondaryColor,
               ),
             ),
             BottomNavigationBarItem(
               title: Text(
                 'General Info',
                 style: TextStyle(
-                  color: kUnActiveColor,
+                  color: kSecondaryColor,
                 ),
               ),
               icon: Icon(
                 Icons.info,
-                color: kUnActiveColor,
+                color: kSecondaryColor,
               ),
             ),
           ],

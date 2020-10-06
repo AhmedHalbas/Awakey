@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 
 const kMainColor = Colors.white;
 const kSecondaryColor = Color(0xFF0066B2);
-const kUnActiveColor = Color(0xFF0066B2);
 
 const kUserCollection = 'Users';
-const kScheduleCollection = 'Schedule';
 
 const kCommanderName = 'commanderName';
 const kCommanderRole = 'commanderRole';
@@ -26,6 +24,8 @@ const kMemberHeight = 'membersHeight';
 const kIsCommander = 'isCommander';
 
 const kKeepMeLoggedIn = 'KeepMeLoggedIn';
+
+const kUserId = 'UserId';
 
 const List<String> dailyActivities = [
   'Wake Up',

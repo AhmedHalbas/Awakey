@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login_screen.dart';
 
@@ -16,12 +17,17 @@ class SignupScreen extends StatelessWidget {
   static String id = 'SignupScreen';
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   final auth = Auth();
+  String uId;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     String email, password;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Register'),
+      ),
       backgroundColor: kMainColor,
       body: ModalProgressHUD(
         inAsyncCall: Provider.of<ModalHud>(context).isLoading,
@@ -57,19 +63,21 @@ class SignupScreen extends StatelessWidget {
                 height: height * 0.05,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 125),
+                padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Builder(
                   builder: (context) => FlatButton(
                     onPressed: () async {
                       final modalHud =
-                          Provider.of<ModalHud>(context, listen: false);
+                      Provider.of<ModalHud>(context, listen: false);
                       modalHud.changeisLoading(true);
                       if (_globalKey.currentState.validate()) {
                         _globalKey.currentState.save();
                         try {
                           await auth.SignUp(email.trim(), password.trim());
+                          saveId();
                           modalHud.changeisLoading(false);
-                          Navigator.pushNamed(context, SignUpOptionsScreen.id);
+                          Navigator.pushReplacementNamed(
+                              context, SignUpOptionsScreen.id);
                         } on PlatformException catch (e) {
                           modalHud.changeisLoading(false);
                           Scaffold.of(context).showSnackBar(
@@ -81,10 +89,13 @@ class SignupScreen extends StatelessWidget {
                       }
                       modalHud.changeisLoading(false);
                     },
-                    color: Color(0xFF0066B2),
-                    child: Text(
-                      'Continue',
-                      style: TextStyle(color: Colors.white),
+                    color: kSecondaryColor,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        'Continue',
+                        style: TextStyle(color: kMainColor),
+                      ),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -121,5 +132,11 @@ class SignupScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  saveId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uId = (await auth.getUser()).uid;
+    prefs.setString(kUserId, uId);
   }
 }

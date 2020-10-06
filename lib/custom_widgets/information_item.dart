@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 class InformationItem extends StatelessWidget {
   final String itemText;
   final String Image;
+  final Function onPress;
 
-  InformationItem({
-    @required this.itemText,
-    @required this.Image,
-  });
+  InformationItem(
+      {@required this.itemText, @required this.Image, this.onPress});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: ReusableCard(
+        onPress: onPress,
         colour: kSecondaryColor,
         cardChild: Column(
           mainAxisAlignment: MainAxisAlignment.center,

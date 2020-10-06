@@ -4,8 +4,6 @@ class Commander {
   double weight, height;
   bool isCommander;
 
-
-
   Commander(
       this.fullName,
       this.role,

@@ -2,9 +2,14 @@ import 'package:astronauthelper/constants.dart';
 import 'package:astronauthelper/services/auth.dart';
 import 'package:astronauthelper/services/fire_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../functions.dart';
+
 class CommanderSchedule extends StatefulWidget {
+  static String id = 'CommanderSchedule';
+
   @override
   _CommanderScheduleState createState() => _CommanderScheduleState();
 }
@@ -20,7 +25,6 @@ class _CommanderScheduleState extends State<CommanderSchedule> {
   @override
   void initState() {
     super.initState();
-    getUserID();
   }
 
   @override
@@ -39,7 +43,6 @@ class _CommanderScheduleState extends State<CommanderSchedule> {
                       isShown = false;
                       buttonText = 'Edit Time';
                     } else {
-                      defaultData();
                       isEnabled = true;
                       isShown = true;
                       buttonText = 'Finish Edit';
@@ -49,29 +52,47 @@ class _CommanderScheduleState extends State<CommanderSchedule> {
                 color: Colors.black,
                 child: Text(
                   buttonText,
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: kMainColor),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
             ),
-            StreamBuilder<DocumentSnapshot>(
-                stream: _fireStore.getScheduleData(uId),
-                builder: (BuildContext context,
-                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  if (snapshot.hasData) {
-                    for (String activity in dailyActivities) {
-                      newTimes.add(snapshot.data.data[activity]);
-                    }
-                    return DataTable(columns: [
-                      DataColumn(label: Text('Activity')),
-                      DataColumn(label: Text('Time')),
-                    ], rows: getDataRows(dailyActivities, newTimes));
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                })
+            FutureBuilder<FirebaseUser>(
+              future: auth.getUser(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
+                if (snapshot.hasData &&
+                    snapshot.connectionState == ConnectionState.done) {
+                  uId = snapshot.data.uid;
+                  print(uId);
+                  return StreamBuilder<DocumentSnapshot>(
+                      stream: _fireStore.getScheduleData(uId),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data[dailyActivities[0]] != null) {
+                            for (String activity in dailyActivities) {
+                              newTimes.add(snapshot.data[activity]);
+                            }
+                          } else {
+                            defaultData(uId);
+                            newTimes.addAll(times);
+                          }
+
+                          return DataTable(columns: [
+                            DataColumn(label: Text('Activity')),
+                            DataColumn(label: Text('Time')),
+                          ], rows: getDataRows(dailyActivities, newTimes));
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                      });
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
           ]),
         ),
       ),
@@ -79,9 +100,6 @@ class _CommanderScheduleState extends State<CommanderSchedule> {
   }
 
   List<DataRow> getDataRows(List<String> activities, List<String> newTimes) {
-    if (newTimes[0] == null) {
-      newTimes = times;
-    }
     List<DataRow> list = List<DataRow>();
     for (var i = 0; i < activities.length; i++) {
       if (i == activities.length - 1) {
@@ -105,13 +123,14 @@ class _CommanderScheduleState extends State<CommanderSchedule> {
                 TextFormField(
                   initialValue: newTimes[i],
                   enabled: isEnabled,
-                  onChanged: (val) {
+                  onFieldSubmitted: (val) {
                     newTimes[i] = val;
                     Firestore.instance
                         .collection(kUserCollection)
                         .document(uId)
                         .updateData({dailyActivities[i]: val});
                   },
+                  onChanged: (val) {},
                 ),
                 showEditIcon: isShown),
           ]),
@@ -119,20 +138,5 @@ class _CommanderScheduleState extends State<CommanderSchedule> {
       }
     }
     return list;
-  }
-
-  defaultData() {
-    for (int i = 0; i < dailyActivities.length; i++) {
-      Firestore.instance
-          .collection(kUserCollection)
-          .document(uId)
-          .updateData({dailyActivities[i]: times[i]});
-    }
-  }
-
-  Future<void> getUserID() async {
-    uId = (await auth.getUser()).uid;
-    setState(() {});
-    // here you write the codes to input the data into firestore
   }
 }

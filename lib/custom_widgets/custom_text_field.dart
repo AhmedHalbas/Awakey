@@ -5,12 +5,15 @@ class CustomTextField extends StatelessWidget {
   final String hint;
   final IconData icon;
   final Function onSaved;
+  final Function onChanged;
   final String initialValue;
   final TextEditingController controller;
   final TextInputType textInputType;
   final Function onTap;
+
   CustomTextField(
       {this.onSaved,
+        this.onChanged,
       @required this.hint,
       @required this.icon,
       this.textInputType,
@@ -51,7 +54,7 @@ class CustomTextField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
         style: TextStyle(
-          color: Colors.white,
+          color: kMainColor,
         ),
         initialValue: initialValue,
         controller: controller,
@@ -64,11 +67,12 @@ class CustomTextField extends StatelessWidget {
           }
         },
         obscureText: hint == 'Enter Your Password' ? true : false,
+        onChanged: onChanged,
         onSaved: onSaved,
         cursorColor: kMainColor,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white),
+          hintStyle: TextStyle(color: kMainColor),
           prefixIcon: Icon(
             icon,
             color: kMainColor,

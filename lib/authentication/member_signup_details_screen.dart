@@ -1,19 +1,18 @@
 import 'package:astronauthelper/constants.dart';
 import 'package:astronauthelper/custom_widgets/custom_text_field.dart';
-import 'package:astronauthelper/authentication/login_screen.dart';
+import 'package:astronauthelper/custom_widgets/logo_and_name.dart';
 import 'package:astronauthelper/models/member.dart';
 import 'package:astronauthelper/provider/modal_hud.dart';
 import 'package:astronauthelper/screens/member/member_screen.dart';
+import 'package:astronauthelper/services/auth.dart';
 import 'package:astronauthelper/services/fire_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:astronauthelper/custom_widgets/logo_and_name.dart';
-import 'package:astronauthelper/services/auth.dart';
 import 'package:flutter/services.dart';
-
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MemberSignupDetailsScreen extends StatefulWidget {
   static String id = 'MemberSignupDetailsScreen';
@@ -36,10 +35,13 @@ class _MemberSignupDetailsScreenState extends State<MemberSignupDetailsScreen> {
 
   bool isCorrectMissionName = false;
 
+  List<String> missionNames = [];
+
   @override
   void initState() {
     super.initState();
-    getUserID();
+    getId();
+    getMissionNames();
   }
 
   @override
@@ -48,7 +50,6 @@ class _MemberSignupDetailsScreenState extends State<MemberSignupDetailsScreen> {
     String fullName, role, missionName;
     int age;
     double weight, height;
-    //checkMissionName(missionName);
     return Scaffold(
       backgroundColor: kMainColor,
       body: ModalProgressHUD(
@@ -169,7 +170,7 @@ class _MemberSignupDetailsScreenState extends State<MemberSignupDetailsScreen> {
                       color: Colors.black,
                       child: Text(
                         'Sign Up',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: kMainColor),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -188,26 +189,32 @@ class _MemberSignupDetailsScreenState extends State<MemberSignupDetailsScreen> {
     );
   }
 
-  void getUserID() async {
-    firebaseUser = await auth.getUser();
-    uId = firebaseUser.uid;
-    // here you write the codes to input the data into firestore
-  }
-
-  void checkMissionName(missionName) {
+  void getMissionNames() {
     CollectionReference _documentRef =
         Firestore.instance.collection(kUserCollection);
 
     _documentRef.getDocuments().then((ds) {
       if (ds != null) {
         ds.documents.forEach((value) {
-          if (value.data[kMissionName] != null &&
-              value.data[kMissionName] == missionName) {
-            isCorrectMissionName = true;
-            return;
-          }
+          if (value.data[kMissionName] != null)
+            missionNames.add(value.data[kMissionName]);
         });
       }
     });
+  }
+
+  void checkMissionName(missionName) {
+    for (String mission in missionNames) {
+      if (mission == missionName) {
+        setState(() {
+          isCorrectMissionName = true;
+        });
+      }
+    }
+  }
+
+  getId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uId = prefs.getString(kUserId);
   }
 }

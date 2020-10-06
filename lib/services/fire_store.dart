@@ -39,21 +39,7 @@ class FireStore {
         .snapshots();
   }
 
-//  storeOrders(data, List<String> products) {
-//    var documentReference = _firestore.collection(kOrders).document();
-//    documentReference.setData(data);
-//
-//    for (var product in products) {
-//      documentReference.collection(kOrderDetails).document().setData({
-//        kProductName: product.pName,
-//        kProductPrice: product.pPrice,
-//        kProductQuantity: product.pQuantity,
-//        kProductLocation: product.pLocation,
-//      });
-//    }
-//  }
-
-  Stream<QuerySnapshot> getMembersSchedule() {
-    return _firestore.collection(kUserCollection).snapshots();
+  Stream<QuerySnapshot> getMemberId() {
+    return Firestore.instance.collection(kUserCollection).snapshots();
   }
 }
