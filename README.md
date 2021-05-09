@@ -1,16 +1,51 @@
-# Awakey
+<p align="center">
+<a href="https://linkedin.com/in/ahmedhalbas" target="blank"><img align="center" src="https://cdn.jsdelivr.net/npm/simple-icons@3.0.1/icons/linkedin.svg" alt="ahmedhalbas" height="30" width="30" /></a>
+</p>
 
-A new Flutter application.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+  <a href="https://drive.google.com/file/d/1DuNe7oMkmOzZoQEH1cqq1Iu8KSQ__JLO/view?usp=sharing">
+    <img src="https://cybersecurity-excellence-awards.com/wp-content/uploads/2017/12/430215.jpg" alt="Logo" width="300" height="200">
+  </a>
+  <a href="https://drive.google.com/file/d/1DuNe7oMkmOzZoQEH1cqq1Iu8KSQ__JLO/view?usp=sharing">
+  <h3 align="center">Awakey</h3>
+  </a>
+  
+  
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+  <p align="center">
+   a Flutter shift scheduling tool for astronauts
+    <br />
+   
+  </p>
+</p>
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+
+
+* There are 2 Roles: 
+* Ship Leader (View all Crew Members Schedules and Edit it)
+* Crew Member (View His/Her Schedule Only)
+
+
+
+### Technologies Used
+
+* Flutter
+* Firebase
+
+
+
+
+
